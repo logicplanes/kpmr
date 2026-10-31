@@ -18,7 +18,6 @@ Rules for people and coding agents working on KPMR, the Kaeso Provider & Model R
 | `src/shared`          | The catalogue format and the shapes of every endpoint, shared by the service and the interface                   |
 | `src/server`          | models.dev fetch, merge, catalogue, signature, changes, state and the HTTP handler; `main.ts` is the entry point |
 | `src/web`             | The interface: pages, router, the English, German and Chinese messages                                           |
-| `deploy/`             | The Compose file and the self-deploy scripts and units for the production server                                 |
 | `scripts/`            | The registry check and the license check                                                                         |
 
 ## Definition of done
@@ -49,7 +48,7 @@ For a registry change, also run `pnpm registry:check --upstream` and read its no
 9. **Never commit secrets.** The signing key lives only on the server.
 10. **No leftovers.** Rename or remove a name, route, field or message everywhere in the same change.
 
-## Git and deploys
+## Git
 
-- `main` takes changes through pull requests. Every commit on `main` goes live by itself within minutes; the image build runs every check, and a failing build or an unhealthy container leaves the previous version live.
+- `main` takes changes through pull requests; the one required check is **CI**. The image build (`Dockerfile`) runs every check of the definition of done.
 - Commit messages say what changed and why.

@@ -1,6 +1,6 @@
 # The registry
 
-Everything KPMR changes about models.dev lives here, one file per provider in `providers/<provider id>.toml`, plus `index.toml`. A merged pull request is live within minutes. `pnpm registry:check` checks every file; `pnpm registry:check --upstream` also compares them with models.dev as it is now and lists entries that no longer change anything.
+Everything KPMR changes about models.dev lives here, one file per provider in `providers/<provider id>.toml`, plus `index.toml`. `pnpm registry:check` checks every file; `pnpm registry:check --upstream` also compares them with models.dev as it is now and lists entries that no longer change anything.
 
 ## A correction
 
