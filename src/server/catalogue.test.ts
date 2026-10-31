@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseRegistry } from "../registry/load.ts";
-import { buildProviders, catalogue, cataloguePath, catalogueModel } from "./catalogue.ts";
+import { buildProviders, catalogue, cataloguePath, catalogueModel, patternOf } from "./catalogue.ts";
 import { decimalText, multiplyDecimal } from "./decimal.ts";
 import { diffProviders } from "./diff.ts";
 import { mergeRegistry, type Upstream } from "./merge.ts";
@@ -178,5 +178,22 @@ describe("review fixes", () => {
       adaptive_thinking: true,
       thinking_binding: null,
     });
+  });
+});
+
+describe("rules for some models", () => {
+  it("apply only to model ids matching their pattern", () => {
+    const files = REGISTRY.map((f) =>
+      f.path === "registry/index.toml"
+        ? { ...f, text: f.text.replace('provider = "anthropic"\nset', 'provider = "anthropic"\nmodels = "claude-opus-*"\nset') }
+        : f,
+    );
+    const o = parseRegistry(files, TODAY, "r");
+    const built = buildProviders(mergeRegistry(structuredClone(UPSTREAM) as Upstream, o), o);
+    expect(built.providers.anthropic?.models["claude-opus-5-5"]?.pricing.cache_write_1h).toBe("8");
+    expect(built.providers.anthropic?.models["claude-haiku-4-5"]?.pricing.cache_write_1h).toBeNull();
+    expect(patternOf("anthropic/claude-*")("anthropic/claude-opus-4.6")).toBe(true);
+    expect(patternOf("anthropic/claude-*")("openai/gpt-6")).toBe(false);
+    expect(patternOf("a.b")("axb")).toBe(false);
   });
 });

@@ -116,16 +116,26 @@ function rules(raw: unknown, today: string, problems: string[]): Rule[] {
   return raw.flatMap((r, i): Rule[] => {
     const at = `registry/index.toml: rules[${i}]`;
     if (!isObject(r)) return (void problems.push(`${at} must be a table`), []);
-    const { provider, set, from, multiply, note: rawNote, sources, ...rest } = r;
-    for (const key of Object.keys(rest)) problems.push(`${at}.${key} is not a field of a rule; known: provider, set, from, multiply, note, sources`);
+    const { provider, models, set, from, multiply, note: rawNote, sources, ...rest } = r;
+    for (const key of Object.keys(rest)) problems.push(`${at}.${key} is not a field of a rule; known: provider, models, set, from, multiply, note, sources`);
     if (typeof provider !== "string" || !PROVIDER_ID.test(provider)) problems.push(`${at}.provider must be a provider id`);
+    if (models !== undefined && (typeof models !== "string" || !/^[\w.:@/+*-]+$/.test(models)))
+      problems.push(`${at}.models must be a model id pattern such as anthropic/claude-*`);
     if (typeof set !== "string" || !PRICE_PATHS.has(set)) problems.push(`${at}.set must be a price path such as cost.cache_write_1h`);
     if (typeof from !== "string" || !PRICE_PATHS.has(from)) problems.push(`${at}.from must be a price path such as cost.input`);
     if (typeof multiply !== "number" || !Number.isInteger(multiply * 1000) || multiply <= 0 || multiply > 100)
       problems.push(`${at}.multiply must be a number above 0 and at most 100, with at most three decimals`);
     const checked = checkSources(sources, at, problems, today);
     return [
-      { provider: String(provider), set: String(set), from: String(from), multiply: Number(multiply), note: note(rawNote, at, problems), sources: checked },
+      {
+        provider: String(provider),
+        models: typeof models === "string" ? models : null,
+        set: String(set),
+        from: String(from),
+        multiply: Number(multiply),
+        note: note(rawNote, at, problems),
+        sources: checked,
+      },
     ];
   });
 }

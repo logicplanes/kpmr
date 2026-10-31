@@ -7,4 +7,25 @@ set = "cost.cache_write_1h"
 from = "cost.input"
 multiply = 2
 note = "A one-hour cache write costs twice the input price; models.dev lists only the five-minute price."
-sources = [{ url = "https://platform.claude.com/docs/en/about-claude/pricing", checked = 2026-10-19 }]
+sources = [{ url = "https://platform.claude.com/docs/en/about-claude/pricing", checked = 2026-10-31 }]
+
+[[rules]]
+provider = "vercel"
+models = "anthropic/claude-*"
+set = "cost.cache_write_1h"
+from = "cost.input"
+multiply = 2
+note = "Vercel's AI Gateway passes on Anthropic's list prices without markup, and Anthropic charges a one-hour cache write at twice the input price."
+sources = [
+  { url = "https://vercel.com/docs/ai-gateway/pricing", checked = 2026-10-31 },
+  { url = "https://platform.claude.com/docs/en/about-claude/pricing", checked = 2026-10-31 },
+]
+
+[[rules]]
+provider = "openrouter"
+models = "anthropic/claude-*"
+set = "cost.cache_write_1h"
+from = "cost.input"
+multiply = 2
+note = "OpenRouter charges a one-hour cache write for Claude models at twice the input price."
+sources = [{ url = "https://openrouter.ai/docs/features/prompt-caching", checked = 2026-10-31 }]

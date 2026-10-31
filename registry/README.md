@@ -73,4 +73,4 @@ multiply = 2
 sources = [{ url = "https://platform.claude.com/docs/en/about-claude/pricing", checked = 2026-10-19 }]
 ```
 
-A rule never overwrites a price models.dev or an entry already sets.
+`models = "anthropic/claude-*"` limits a rule to the model ids that match the pattern (`*` matches anything). A rule never overwrites a price models.dev or an entry already sets, nor one an entry unsets.

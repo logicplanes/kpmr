@@ -38,6 +38,7 @@ export interface ProviderEntry {
 
 export interface Rule {
   provider: string;
+  models: string | null;
   set: string;
   from: string;
   multiply: number;

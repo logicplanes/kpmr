@@ -123,6 +123,17 @@ export function catalogueModel(id: string, model: JsonObject, origin: ModelOrigi
   };
 }
 
+export function patternOf(pattern: string | null): (id: string) => boolean {
+  if (pattern === null) return () => true;
+  const re = new RegExp(
+    `^${pattern
+      .split("*")
+      .map((p) => p.replace(/[.+?^${}()|[\]\\]/g, "\\$&"))
+      .join(".*")}$`,
+  );
+  return (id) => re.test(id);
+}
+
 const SKIPPED = new Set(["id", "origin", "corrected"]);
 
 function flat(model: CatalogueModel): Map<string, Json> {
@@ -145,8 +156,9 @@ function applyRules(models: JsonObject, rules: Rule[], unsets: Map<string, strin
   for (const rule of rules) {
     const [, from] = rule.from.split(".") as [string, string];
     const [, set] = rule.set.split(".") as [string, string];
+    const matches = patternOf(rule.models);
     for (const [id, model] of Object.entries(models)) {
-      if (!isObject(model)) continue;
+      if (!isObject(model) || !matches(id)) continue;
       const cost = isObject(model.cost) ? model.cost : null;
       const base = cost ? price(cost[from]) : null;
       if (!cost || base === null || cost[set] !== undefined || unsets.get(id)?.includes(rule.set)) continue;
