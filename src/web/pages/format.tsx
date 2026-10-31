@@ -3,6 +3,7 @@ import { FORMAT, MEDIA_TYPE, type Meta, type ModelView } from "../../shared/cata
 import { useJson } from "../data.ts";
 import { useI18n, type MessageKey } from "../i18n/index.ts";
 import { Page, whenReady } from "../page.tsx";
+import { HeaderLinks } from "./overview.tsx";
 
 const ORIGIN = "https://kpmr.kaeso.app";
 const SAMPLE = "/v1/models/anthropic/claude-sonnet-5-5.json";
@@ -12,7 +13,7 @@ Host: kpmr.kaeso.app
 Accept: ${MEDIA_TYPE}; version=${FORMAT}
 Accept-Encoding: br, gzip
 If-None-Match: "TBZDfwxDDgnfsglvFAGIRhKMmTT"
-User-Agent: kaeso-gateway/0.4.9`;
+User-Agent: kaeso-gateway/0.5.0`;
 
 const RESPONSE = `HTTP/1.1 200 OK
 Content-Type: ${MEDIA_TYPE}; version=${FORMAT}
@@ -51,7 +52,7 @@ export function FormatPage() {
   const meta = useJson<Meta>("/v1/meta.json");
   const sample = useJson<ModelView>(SAMPLE);
   return (
-    <Page title={t("format.title")} documentTitle={t("format.title")}>
+    <Page title={t("format.title")} documentTitle={t("format.title")} actions={<HeaderLinks meta={meta.state === "ready" ? meta.data : null} />}>
       <div className="flex max-w-800 flex-col gap-40">
         <Text variant="body-lg" tone="secondary">
           {t("format.lead")}

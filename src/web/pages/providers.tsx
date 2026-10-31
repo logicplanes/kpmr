@@ -4,6 +4,9 @@ import type { ProviderSummary } from "../../shared/catalogue.ts";
 import { useJson } from "../data.ts";
 import { useI18n } from "../i18n/index.ts";
 import { Page } from "../page.tsx";
+import { HeaderTitle } from "../cells.tsx";
+import { HeaderLinks } from "./overview.tsx";
+import { formatNumber } from "@logicplanes/kaeso-ui/format";
 import { href, navigate, providerPath } from "../router.tsx";
 
 export function ProvidersPage() {
@@ -31,7 +34,12 @@ export function ProvidersPage() {
     col.number({ id: "added", header: t("providers.added"), size: 112, priority: 2 }, (p: ProviderSummary) => p.added),
   ];
   return (
-    <Page title={t("providers.title")} documentTitle={t("providers.title")} padding="none">
+    <Page
+      title={<HeaderTitle title={t("providers.title")} count={providers.state === "ready" ? formatNumber(rows.length) : undefined} />}
+      documentTitle={t("providers.title")}
+      padding="none"
+      actions={<HeaderLinks meta={null} />}
+    >
       <Toolbar aria-label={t("providers.title")}>
         <Segmented
           aria-label={t("providers.scope")}

@@ -1,12 +1,14 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { AppFrame, Icon, LinkProvider, Sidebar, ThemeProvider, TooltipProvider, Toaster, icons } from "@logicplanes/kaeso-ui";
+import { AppFrame, Icon, LinkProvider, ProviderBadge, Sidebar, ThemeProvider, TooltipProvider, Toaster, icons } from "@logicplanes/kaeso-ui";
 import { setFormatLocale } from "@logicplanes/kaeso-ui/format";
 import { LocaleProvider, loadUiMessages, type UiMessages } from "@logicplanes/kaeso-ui/i18n";
 import { I18nContext, translator, useI18n, type Locale } from "./i18n/index.ts";
 import { SidebarFooter } from "./footer.tsx";
 import { PageBoundary } from "./boundary.tsx";
 import { Failed } from "./page.tsx";
-import { href, LocationProvider, RouterLink, useLocation, type Route } from "./router.tsx";
+import { href, LocationProvider, providerPath, RouterLink, useLocation, type Route } from "./router.tsx";
+import { useJson } from "./data.ts";
+import type { ProviderSummary } from "../shared/catalogue.ts";
 import { NotFoundPage } from "./pages/not-found.tsx";
 import { OverviewPage } from "./pages/overview.tsx";
 import { ProviderPage } from "./pages/provider.tsx";
@@ -54,10 +56,10 @@ function Localized() {
 }
 
 const PAGES = [
-  { id: "overview", path: "/", icon: icons.overview, label: "nav.overview" },
-  { id: "providers", path: "/providers", icon: icons.provider, label: "nav.providers" },
-  { id: "changes", path: "/changes", icon: icons.audit, label: "nav.changes" },
-  { id: "format", path: "/format", icon: icons.code, label: "nav.format" },
+  { id: "overview", path: "/", label: "nav.overview" },
+  { id: "providers", path: "/providers", label: "nav.providers" },
+  { id: "changes", path: "/changes", label: "nav.changes" },
+  { id: "format", path: "/format", label: "nav.format" },
 ] as const;
 
 function section(route: Route): string {
@@ -80,24 +82,17 @@ function Shell() {
               <Sidebar.CollapseToggle />
             </Sidebar.Brand>
             <Sidebar.Content>
-              <Sidebar.Group label={t("app.name")}>
+              <Sidebar.Group>
                 {PAGES.map((p) => (
-                  <Sidebar.Item key={p.id} icon={p.icon} href={href(locale, p.path)} active={current === p.id}>
+                  <Sidebar.Item key={p.id} href={href(locale, p.path)} active={current === p.id}>
                     {t(p.label)}
                   </Sidebar.Item>
                 ))}
-              </Sidebar.Group>
-              <Sidebar.Group label={t("nav.kaeso")}>
-                <Sidebar.Item href="https://kaeso.app" trailing={<Icon icon={icons.externalLink} size="xs" />}>
-                  kaeso.app
-                </Sidebar.Item>
                 <Sidebar.Item href="https://docs.kaeso.app" trailing={<Icon icon={icons.externalLink} size="xs" />}>
                   {t("nav.docs")}
                 </Sidebar.Item>
-                <Sidebar.Item href="https://github.com/logicplanes/kpmr" trailing={<Icon icon={icons.externalLink} size="xs" />}>
-                  GitHub
-                </Sidebar.Item>
               </Sidebar.Group>
+              <KaesoProviders active={route.page === "provider" || route.page === "model" ? route.provider : null} />
             </Sidebar.Content>
             <Sidebar.Footer className="gap-8">
               <SidebarFooter />
@@ -112,6 +107,30 @@ function Shell() {
         </PageBoundary>
       </AppFrame>
     </Sidebar.Provider>
+  );
+}
+
+function KaesoProviders({ active }: { active: string | null }) {
+  const { t, locale } = useI18n();
+  const providers = useJson<ProviderSummary[]>("/v1/providers.json");
+  return (
+    <Sidebar.Group label={t("nav.kaesoProviders")} id="kaeso-providers">
+      {providers.state === "loading" && <Sidebar.Loading rows={6} />}
+      {providers.state === "ready" &&
+        providers.data
+          .filter((p) => p.kaeso)
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((p) => (
+            <Sidebar.Item
+              key={p.id}
+              href={href(locale, providerPath(p.id))}
+              active={active === p.id}
+              leading={<ProviderBadge provider={p.id} name={p.name} size="sm" />}
+            >
+              {p.name}
+            </Sidebar.Item>
+          ))}
+    </Sidebar.Group>
   );
 }
 

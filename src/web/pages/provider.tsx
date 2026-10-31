@@ -3,19 +3,22 @@ import {
   Badge,
   DataTable,
   Empty,
-  KeyValue,
+  Heading,
   Link,
   ModelLabel,
   ProviderBadge,
   SearchInput,
   Segmented,
+  Text,
   Toolbar,
   col,
   type Capability,
 } from "@logicplanes/kaeso-ui";
-import { formatContext } from "@logicplanes/kaeso-ui/format";
+import { formatContext, formatNumber } from "@logicplanes/kaeso-ui/format";
 import type { ModelSummary, ProviderView } from "../../shared/catalogue.ts";
 import { useJson } from "../data.ts";
+import { Cell, Cells, HeaderTitle, Metric } from "../cells.tsx";
+import { HeaderLinks } from "./overview.tsx";
 import { useI18n } from "../i18n/index.ts";
 import { Missing, Page, price, whenReady } from "../page.tsx";
 import { href, modelPath, navigate } from "../router.tsx";
@@ -33,7 +36,12 @@ export function ProviderPage({ id }: { id: string }) {
   const view = useJson<ProviderView>(`/v1/providers/${encodeURIComponent(id)}.json`);
   const name = view.state === "ready" ? view.data.provider.name : id;
   return (
-    <Page title={name} documentTitle={name} padding="none">
+    <Page
+      title={<HeaderTitle title={name} count={view.state === "ready" ? formatNumber(view.data.models.length) : undefined} />}
+      documentTitle={name}
+      padding="none"
+      actions={<HeaderLinks meta={null} />}
+    >
       {whenReady(
         view,
         (v) => (
@@ -105,7 +113,7 @@ function Provider({ view }: { view: ProviderView }) {
       (v: number, m) => (
         <span className="flex items-center gap-4">
           {v === 2 && <Badge tone="info">{t("origin.kpmr")}</Badge>}
-          {v === 1 && <Badge tone="info">{t("origin.corrected")}</Badge>}
+          {v === 1 && <Badge tone="outline">{t("origin.corrected")}</Badge>}
           {m.status !== "active" && <Badge tone={m.status === "deprecated" ? "warning" : "neutral"}>{t(`status.${m.status}`)}</Badge>}
         </span>
       ),
@@ -113,33 +121,45 @@ function Provider({ view }: { view: ProviderView }) {
   ];
   return (
     <>
-      <div className="flex flex-col gap-16 px-24 pt-16 pb-24">
-        <span className="flex items-center gap-12">
-          <ProviderBadge provider={p.id} name={p.name} size="lg" />
-          {view.kaeso && <Badge tone="success">{t("provider.usedByKaeso")}</Badge>}
-          {p.origin === "kpmr" && <Badge tone="info">{t("origin.kpmr")}</Badge>}
+      <div className="flex items-center gap-16 px-24 pt-40 pb-32 hairline-b-strong">
+        <ProviderBadge provider={p.id} name={p.name} size="xl" />
+        <span className="flex min-w-0 flex-col gap-4">
+          <Heading level={1} size="title-lg">
+            {p.name}
+          </Heading>
+          <span className="flex flex-wrap items-center gap-8">
+            <Text tone="tertiary" mono>
+              {p.id}
+            </Text>
+            {view.kaeso && <Badge tone="success">{t("provider.usedByKaeso")}</Badge>}
+            {p.origin === "kpmr" && <Badge tone="info">{t("origin.kpmr")}</Badge>}
+          </span>
         </span>
-        <KeyValue
-          layout="grid"
-          columns={4}
-          items={[
-            { label: t("provider.id"), value: p.id, mono: true, copy: p.id },
-            { label: t("providers.models"), value: t("common.modelCount", { count: view.models.length }) },
-            { label: t("provider.env"), value: p.env.length ? p.env.join(", ") : t("model.none"), mono: p.env.length > 0 },
-            {
-              label: t("provider.docs"),
-              value: p.docs_url ? (
-                <Link href={p.docs_url} external>
-                  {hostOf(p.docs_url)}
-                </Link>
-              ) : (
-                unknown
-              ),
-            },
-            ...(p.api_url ? [{ label: t("provider.api"), value: p.api_url, mono: true, copy: p.api_url, span: "row" as const }] : []),
-          ]}
-        />
       </div>
+      <Cells columns={4}>
+        <Metric label={t("overview.stat.models")} value={formatNumber(view.models.length)} />
+        <Metric label={t("overview.stat.corrected")} value={formatNumber(view.models.filter((m) => m.origin === "models_dev" && m.corrected > 0).length)} />
+        <Cell>
+          <Text variant="small" tone="secondary">
+            {t("provider.env")}
+          </Text>
+          <Text mono truncate>
+            {p.env.length ? p.env.join(", ") : t("model.none")}
+          </Text>
+        </Cell>
+        <Cell>
+          <Text variant="small" tone="secondary">
+            {t("provider.docs")}
+          </Text>
+          {p.docs_url ? (
+            <Link href={p.docs_url} external>
+              {hostOf(p.docs_url)}
+            </Link>
+          ) : (
+            <Text tone="tertiary">{unknown}</Text>
+          )}
+        </Cell>
+      </Cells>
       <Toolbar aria-label={t("provider.filter")}>
         <Segmented
           aria-label={t("provider.filter")}

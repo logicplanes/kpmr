@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Badge, Empty, Segmented, Text, Timeline, type TimelineEvent } from "@logicplanes/kaeso-ui";
-import { formatRelative } from "@logicplanes/kaeso-ui/format";
+import { formatNumber, formatRelative } from "@logicplanes/kaeso-ui/format";
+import { HeaderTitle } from "../cells.tsx";
+import { HeaderLinks } from "./overview.tsx";
 import type { Change } from "../../shared/catalogue.ts";
 import { useJson } from "../data.ts";
 import { useI18n, type Locale, type Translate } from "../i18n/index.ts";
@@ -47,7 +49,11 @@ export function ChangesPage() {
   const [cause, setCause] = useState("all");
   const changes = useJson<Change[]>("/v1/changes.json?limit=500");
   return (
-    <Page title={t("changes.title")} documentTitle={t("changes.title")}>
+    <Page
+      title={<HeaderTitle title={t("changes.title")} count={changes.state === "ready" ? formatNumber(changes.data.length) : undefined} />}
+      documentTitle={t("changes.title")}
+      actions={<HeaderLinks meta={null} />}
+    >
       <div className="flex max-w-800 flex-col gap-24">
         <Text tone="secondary">{t("changes.lead")}</Text>
         <Segmented
