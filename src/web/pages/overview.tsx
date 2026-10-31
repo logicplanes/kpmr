@@ -1,4 +1,4 @@
-import { Badge, Banner, Button, ProviderBadge, Text } from "@logicplanes/kaeso-ui";
+import { Banner, Button, ProviderBadge, Text } from "@logicplanes/kaeso-ui";
 import { formatNumber, formatRelative } from "@logicplanes/kaeso-ui/format";
 import type { Meta, ProviderSummary } from "../../shared/catalogue.ts";
 import { Cells, HeaderTitle, LinkCell } from "../cells.tsx";
@@ -37,10 +37,10 @@ export function OverviewPage() {
   const { t } = useI18n();
   const meta = useJson<Meta>("/v1/meta.json");
   const providers = useJson<ProviderSummary[]>("/v1/providers.json");
-  const count = providers.state === "ready" ? formatNumber(providers.data.length) : undefined;
+  const count = providers.state === "ready" ? formatNumber(providers.data.filter((p) => p.kaeso).length) : undefined;
   return (
     <Page
-      title={<HeaderTitle title={t("providers.title")} count={count} />}
+      title={<HeaderTitle title={t("nav.kaesoProviders")} count={count} />}
       documentTitle={t("app.fullName")}
       padding="none"
       actions={<HeaderLinks meta={meta.state === "ready" ? meta.data : null} start />}
@@ -59,27 +59,18 @@ export function OverviewPage() {
 
 function ProviderGrid({ providers }: { providers: ProviderSummary[] }) {
   const { t, locale } = useI18n();
-  const sorted = [...providers].sort((a, b) => Number(b.kaeso) - Number(a.kaeso) || a.name.localeCompare(b.name));
+  const kaeso = providers.filter((p) => p.kaeso).sort((a, b) => a.name.localeCompare(b.name));
   return (
-    <Cells columns={3} label={t("providers.title")}>
-      {sorted.map((p) => (
+    <Cells columns={3} label={t("nav.kaesoProviders")}>
+      {kaeso.map((p) => (
         <LinkCell key={p.id} href={href(locale, providerPath(p.id))} label={p.name}>
-          <span className="flex items-center gap-6">
-            <Text tone="secondary" truncate>
-              {p.name}
-            </Text>
-            <Text as="span" tone="tertiary" className="opacity-0 transition-control group-hover/cell:opacity-100" aria-hidden="true">
-              →
-            </Text>
-          </span>
-          <span className="flex flex-1 flex-col items-center justify-center gap-12 py-24">
+          <span className="flex flex-1 flex-col items-center justify-center gap-16">
             <ProviderBadge provider={p.id} name={p.name} size="xl" />
-            <span className="flex items-center gap-8">
-              <Text variant="small" tone="secondary" tabular>
+            <span className="flex flex-col items-center gap-4">
+              <Text weight="medium">{p.name}</Text>
+              <Text variant="small" tone="tertiary" tabular>
                 {t("overview.modelCount", { count: p.models })}
               </Text>
-              {p.kaeso && <Badge tone="success">Kaeso</Badge>}
-              {p.corrected + p.added > 0 && <Badge tone="outline">KPMR</Badge>}
             </span>
           </span>
         </LinkCell>

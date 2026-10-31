@@ -8,20 +8,28 @@ import { HeaderLinks } from "./overview.tsx";
 const ORIGIN = "https://kpmr.kaeso.app";
 const SAMPLE = "/v1/models/anthropic/claude-sonnet-5-5.json";
 
-const REQUEST = `GET /v1/catalogue?providers=anthropic,openai,mistral HTTP/1.1
-Host: kpmr.kaeso.app
-Accept: ${MEDIA_TYPE}; version=${FORMAT}
-Accept-Encoding: br, gzip
-If-None-Match: "TBZDfwxDDgnfsglvFAGIRhKMmTT"
-User-Agent: kaeso-gateway/0.5.0`;
+const CURL = `curl https://kpmr.kaeso.app/v1/catalogue?providers=anthropic,openai,mistral \\
+  -H "Accept: ${MEDIA_TYPE}; version=${FORMAT}" \\
+  -H "Accept-Encoding: br, gzip" \\
+  -H 'If-None-Match: "TBZDfwxDDgnfsglvFAGIRhKMmTT"' \\
+  -A "kaeso-gateway/0.5.0" --compressed -D -`;
 
-const RESPONSE = `HTTP/1.1 200 OK
-Content-Type: ${MEDIA_TYPE}; version=${FORMAT}
-Content-Encoding: br
-ETag: "Q1n5Wc0hXn2yH7f0b1o9GQ2kLsd"
-KPMR-Revision: 2026-10-31T21:40:12Z-3f9c2a7b1d04
-KPMR-Signature: keyid=kpmr-2026-10, ed25519=4Wl0…Kw==
-Cache-Control: public, max-age=60, stale-while-revalidate=600`;
+const FETCH = `const response = await fetch("https://kpmr.kaeso.app/v1/catalogue?providers=anthropic,openai,mistral", {
+  headers: {
+    accept: "${MEDIA_TYPE}; version=${FORMAT}",
+    "if-none-match": etag,
+  },
+});
+if (response.status === 304) return current;
+const catalogue = await response.json();`;
+
+const RESPONSE = `content-type: ${MEDIA_TYPE}; version=${FORMAT}
+content-encoding: br
+etag: "Q1n5Wc0hXn2yH7f0b1o9GQ2kLsd-br"
+kpmr-revision: 2026-10-31T21:40:12Z-3f9c2a7b1d04
+kpmr-signature: keyid=kpmr-2026-10, ed25519=4Wl0…Kw==
+cache-control: public, max-age=60, stale-while-revalidate=600
+vary: Accept, Accept-Encoding`;
 
 const VERIFY = `import { createPublicKey, verify } from "node:crypto";
 
@@ -60,8 +68,13 @@ export function FormatPage() {
 
         <Section title={t("format.conversation")} description={t("format.conversationBody")} spacing="none">
           <div className="flex flex-col gap-16">
-            <CodeBlock title={t("format.request")} lang="text" code={REQUEST} />
-            <CodeBlock title={t("format.response")} lang="text" code={RESPONSE} />
+            <CodeBlock
+              tabs={[
+                { label: "curl", lang: "bash", code: CURL },
+                { label: "JavaScript", lang: "js", code: FETCH },
+              ]}
+            />
+            <CodeBlock title={t("format.response")} lang="yaml" code={RESPONSE} />
             <KeyValue
               items={(["200", "304", "406", "503"] as const).map((code) => ({
                 label: code,
