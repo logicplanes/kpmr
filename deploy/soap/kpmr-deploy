@@ -3,9 +3,16 @@ set -Eeuo pipefail
 
 DIR=/opt/logicplanes/kpmr
 STATE=/var/lib/logicplanes/kpmr
-REPO=git@github.com:logicplanes/kpmr.git
+REPO=https://github.com/logicplanes/kpmr.git
+TOKEN=/opt/logicplanes/secrets/kpmr-github.token
 HOST=kpmr.kaeso.app
-export GIT_SSH_COMMAND="ssh -i $DIR/deploy-key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+git_() {
+  if [[ -r $TOKEN ]]; then
+    git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $(printf 'x-access-token:%s' "$(tr -d '\n' < "$TOKEN")" | base64 -w0)" "$@"
+  else
+    git "$@"
+  fi
+}
 
 mkdir -p "$STATE" "$DIR/data"
 exec 9>"$STATE/lock"
@@ -13,17 +20,22 @@ flock -n 9 || { echo "kpmr: a deploy is already running"; exit 0; }
 
 log() { echo "kpmr: $*"; }
 want=${1:-main}
+archive=${KPMR_ARCHIVE:-}
 
-if [[ ! -d $DIR/src/.git ]]; then git clone -q --bare "$REPO" "$DIR/src/.git"; fi
-git --git-dir="$DIR/src/.git" fetch -q --prune origin "+refs/heads/*:refs/heads/*"
-commit=$(git --git-dir="$DIR/src/.git" rev-parse --verify "$want^{commit}")
+if [[ -n $archive ]]; then
+  commit=$want
+else
+  if [[ ! -d $DIR/src.git ]]; then git_ clone -q --bare "$REPO" "$DIR/src.git"; fi
+  git_ --git-dir="$DIR/src.git" fetch -q --prune "$REPO" "+refs/heads/*:refs/heads/*"
+  commit=$(git --git-dir="$DIR/src.git" rev-parse --verify "$want^{commit}")
+fi
 tag="git-${commit:0:12}"
 deployed=$(cat "$STATE/deployed" 2>/dev/null || true)
 if [[ $commit == "$deployed" && ${FORCE:-0} != 1 ]]; then log "$tag is live"; exit 0; fi
 
 build=$(mktemp -d)
 trap 'rm -rf "$build"' EXIT
-git --git-dir="$DIR/src/.git" archive "$commit" | tar -x -C "$build"
+if [[ -n $archive ]]; then tar -x -C "$build" -f "$archive"; else git --git-dir="$DIR/src.git" archive "$commit" | tar -x -C "$build"; fi
 log "building $tag"
 if ! nice -n 10 docker build -q -t "kpmr:$tag" --build-arg "KPMR_REVISION=${commit:0:12}" "$build" >/dev/null; then
   echo "$commit" > "$STATE/failed"

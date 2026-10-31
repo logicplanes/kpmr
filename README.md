@@ -70,7 +70,7 @@ Every other address is the registry's interface, in English, German (`/de`) and 
 
 ## Deploy
 
-kpmr.kaeso.app runs on Logicplanes' server and deploys itself: a systemd timer asks GitHub for `main` every two minutes, builds the commit (lint, types, tests and the registry check run in the image build), switches the container, checks it through the proxy and rolls back when it isn't healthy. [`deploy/`](deploy) holds the Compose file and the scripts, which every deploy installs again.
+kpmr.kaeso.app runs on Logicplanes' server and deploys itself: a systemd timer asks GitHub for `main` every two minutes, builds the commit (lint, types, tests and the registry check run in the image build), switches the container, checks it through the proxy and rolls back when it isn't healthy. [`deploy/`](deploy) holds the Compose file and the scripts, which every deploy installs again. `scripts/deploy.sh <ssh host>` deploys the commit you have checked out by hand, the same way.
 
 ## License
 
