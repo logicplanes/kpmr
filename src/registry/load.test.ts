@@ -67,7 +67,15 @@ describe("the registry", () => {
     expect(model(`action = "add"\nsources = [${SOURCE}]\nname = "y"`)).toEqual([
       expect.stringContaining("sets modalities"),
       expect.stringContaining("sets limit"),
+      expect.stringContaining("sets cost"),
     ]);
+    expect(model(`sources = [${SOURCE}]\ncost = { input = 5 }\nunset = ["cost.input"]`)).toEqual([expect.stringContaining("both sets and unsets cost.input")]);
+    expect(model(`sources = [${SOURCE}]\nunset = ["cost.inptu"]`)).toEqual([expect.stringContaining("not a field path")]);
+    expect(model(`sources = [${SOURCE}]\nunset = ["cost.context_over_200k.input", "limit.output"]`)).toEqual([]);
+    expect(model(`sources = [${SOURCE}]\nunset = ["limit.output", "limit.output"]`)).toEqual([expect.stringContaining("lists a path twice")]);
+    expect(
+      problems([index, { path: "registry/providers/x1.toml", text: `[provider]\naction = "add"\nname = "X"\ndoc = "docs"\nsources = [${SOURCE}]` }]),
+    ).toEqual([expect.stringContaining("doc must be an https address")]);
     expect(model(`action = "rename"\nsources = [${SOURCE}]\nname = "y"`)).toEqual([expect.stringContaining("action must be one of")]);
     expect(model(`sources = [${SOURCE}]\nunset = ["nothing.here"]`)).toEqual([expect.stringContaining("not a field path")]);
   });

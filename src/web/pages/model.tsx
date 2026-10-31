@@ -60,7 +60,14 @@ function Model({ view }: { view: ModelView }) {
   return (
     <div className="flex max-w-800 flex-col gap-32">
       <div className="flex flex-col gap-12">
-        <ModelLabel provider={view.provider.id} providerName={view.provider.name} model={m.id} name={m.name ?? undefined} capabilities={capabilities(m)} />
+        <ModelLabel
+          className="self-start"
+          provider={view.provider.id}
+          providerName={view.provider.name}
+          model={m.id}
+          name={m.name ?? undefined}
+          capabilities={capabilities(m)}
+        />
         <span className="flex flex-wrap items-center gap-8">
           <RouterLink href={href(locale, providerPath(view.provider.id))}>{view.provider.name}</RouterLink>
           <Badge tone={m.origin === "kpmr" ? "info" : "neutral"}>{m.origin === "kpmr" ? t("origin.kpmr") : t("origin.models_dev")}</Badge>

@@ -20,6 +20,14 @@ import { useI18n } from "../i18n/index.ts";
 import { Missing, Page, price, whenReady } from "../page.tsx";
 import { href, modelPath, navigate } from "../router.tsx";
 
+const hostOf = (url: string) => {
+  try {
+    return new URL(url).host;
+  } catch {
+    return url;
+  }
+};
+
 export function ProviderPage({ id }: { id: string }) {
   const { t } = useI18n();
   const view = useJson<ProviderView>(`/v1/providers/${encodeURIComponent(id)}.json`);
@@ -122,7 +130,7 @@ function Provider({ view }: { view: ProviderView }) {
               label: t("provider.docs"),
               value: p.docs_url ? (
                 <Link href={p.docs_url} external>
-                  {new URL(p.docs_url).host}
+                  {hostOf(p.docs_url)}
                 </Link>
               ) : (
                 unknown

@@ -67,7 +67,7 @@ export interface Catalogue {
   generated_at: string;
   refresh_seconds: number;
   sources: {
-    models_dev: { url: string; fetched_at: string; sha256: string };
+    models_dev: { url: string; fetched_at: string; sha256: string; license: { spdx: string; copyright: string; url: string } };
     registry: { commit: string; entries: number };
   };
   provider_ids: string[];

@@ -14,7 +14,7 @@ let service: Service;
 const errors: unknown[] = [];
 
 async function serve(svc: Service, webDir: string) {
-  const handler = createHandler(svc, { webDir, onError: (e) => errors.push(e) });
+  const handler = await createHandler(svc, { webDir, origin: "https://kpmr.example", onError: (e) => errors.push(e) });
   const server = createServer((req, res) => void handler(req, res));
   await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
   const address = server.address();
@@ -24,7 +24,10 @@ async function serve(svc: Service, webDir: string) {
 beforeAll(async () => {
   const web = await mkdtemp(join(tmpdir(), "kpmr-web-"));
   await mkdir(join(web, "assets"));
-  await writeFile(join(web, "index.html"), "<!doctype html><title>KPMR</title>");
+  await writeFile(
+    join(web, "index.html"),
+    '<!doctype html>\n<html lang="en">\n  <head>\n    <title>KPMR</title>\n    <meta name="description" content="d" />\n  </head>\n  <body><div id="root"></div></body>\n</html>\n',
+  );
   await writeFile(join(web, "assets/app-1.js"), "console.log(1)");
   await writeFile(join(web, "favicon.svg"), "<svg/>");
   ({ service } = await makeService());
@@ -55,7 +58,20 @@ describe("the catalogue endpoint", () => {
     const etag = r.headers.get("etag") ?? "";
     const again = await fetch(`${base}/v1/catalogue?providers=openai`, { headers: { "if-none-match": etag } });
     expect(again.status).toBe(304);
+    expect(doc.sources.models_dev.license).toEqual({
+      spdx: "MIT",
+      copyright: "Copyright (c) 2025 models.dev",
+      url: "https://github.com/anomalyco/models.dev/blob/dev/LICENSE",
+    });
+    expect((await fetch(`${base}/v1/catalogue?providers=`)).status).toBe(400);
     expect(again.headers.get("kpmr-signature")).toBeTruthy();
+  });
+
+  it("answers 304 to the ETag of any encoding it sent", async () => {
+    const plain = await fetch(`${base}/v1/catalogue`, { headers: { "accept-encoding": "identity" } });
+    const tag = plain.headers.get("etag") ?? "";
+    const br = tag.replace(/"$/, '-br"');
+    expect((await fetch(`${base}/v1/catalogue`, { headers: { "if-none-match": br } })).status).toBe(304);
   });
 
   it("refuses format versions it doesn't serve", async () => {
@@ -65,16 +81,17 @@ describe("the catalogue endpoint", () => {
   });
 
   it("sends gzip to a client that asks only for gzip", async () => {
-    const res = await new Promise<{ encoding: string | undefined; body: Buffer }>((resolve) => {
+    const res = await new Promise<{ encoding: string | undefined; etag: string | undefined; body: Buffer }>((resolve) => {
       import("node:http").then(({ get }) =>
         get(`${base}/v1/catalogue`, { headers: { "accept-encoding": "gzip" } }, (r) => {
           const chunks: Buffer[] = [];
           r.on("data", (c: Buffer) => chunks.push(c));
-          r.on("end", () => resolve({ encoding: r.headers["content-encoding"], body: Buffer.concat(chunks) }));
+          r.on("end", () => resolve({ encoding: r.headers["content-encoding"], etag: r.headers.etag, body: Buffer.concat(chunks) }));
         }),
       );
     });
     expect(res.encoding).toBe("gzip");
+    expect(res.etag).toMatch(/-gz"$/);
     expect(JSON.parse(gunzipSync(res.body).toString()).format).toBe(1);
   });
 });
@@ -91,18 +108,42 @@ describe("the other endpoints", () => {
     expect((await (await fetch(`${base}/v1/keys.json`)).json())[0]).toMatchObject({ id: "test-key", algorithm: "ed25519" });
     expect((await fetch(`${base}/v1/nothing`)).status).toBe(404);
     expect(await (await fetch(`${base}/healthz`)).json()).toMatchObject({ status: "ok", ready: true });
-    expect(await (await fetch(`${base}/robots.txt`)).text()).toContain("Disallow: /v1/");
+    expect(await (await fetch(`${base}/robots.txt`)).text()).toContain("Sitemap: https://kpmr.example/sitemap.xml");
+    const map = await (await fetch(`${base}/sitemap.xml`)).text();
+    expect(map).toContain("<loc>https://kpmr.example/de/providers/anthropic</loc>");
+    expect(map).toContain("<loc>https://kpmr.example/models/anthropic/claude-opus-5-5</loc>");
+    expect(map).not.toContain("models/example/");
+    expect(await (await fetch(`${base}/licenses.txt`)).text()).toContain("Copyright (c) 2025 models.dev");
+    expect(await (await fetch(`${base}/llms.txt`)).text()).toContain("# KPMR, the Kaeso Provider & Model Registry");
+    expect((await fetch(`${base}/v1/providers/%E0.json`)).status).toBe(404);
+    expect((await fetch(`${base}/models/x/%E0`)).status).toBe(404);
   });
 
   it("serves the pages, their assets and a strict policy", async () => {
     const page = await fetch(`${base}/de/providers/anthropic`);
     expect(page.status).toBe(200);
     expect(page.headers.get("content-security-policy")).toContain("script-src 'self'");
-    expect(await page.text()).toContain("<title>KPMR</title>");
+    const html = await page.text();
+    expect(html).toContain('<html lang="de"');
+    expect(html).toContain("<title>Anthropic · KPMR</title>");
+    expect(html).toContain('<link rel="canonical" href="https://kpmr.example/de/providers/anthropic" />');
+    expect(html).toContain('hreflang="zh-CN" href="https://kpmr.example/zh-CN/providers/anthropic"');
+    expect(html).toContain('<meta property="og:image" content="https://kpmr.example/og.png" />');
+    const missing = await fetch(`${base}/providers/nope`);
+    expect(missing.status).toBe(404);
+    expect(await missing.text()).toContain('<meta name="robots" content="noindex" />');
+    expect((await fetch(`${base}/models/anthropic/claude-opus-5-5`)).status).toBe(200);
+    expect((await fetch(`${base}/models/anthropic/nope`)).status).toBe(404);
+    expect((await fetch(`${base}/somewhere`)).status).toBe(404);
+    const en = await fetch(`${base}/en/changes?x=1`, { redirect: "manual" });
+    expect([en.status, en.headers.get("location")]).toEqual([301, "/changes?x=1"]);
+    const slash = await fetch(`${base}/providers/`, { redirect: "manual" });
+    expect([slash.status, slash.headers.get("location")]).toEqual([301, "/providers"]);
     const asset = await fetch(`${base}/assets/app-1.js`);
     expect(asset.headers.get("cache-control")).toContain("immutable");
     expect((await fetch(`${base}/assets/missing.js`)).status).toBe(404);
     expect((await fetch(`${base}/favicon.svg`)).headers.get("content-type")).toBe("image/svg+xml");
+    expect((await fetch(`${base}/nothing.png`)).status).toBe(404);
     expect((await fetch(`${base}/%2e%2e/%2e%2e/etc/passwd`)).status).not.toBe(500);
   });
 
@@ -122,13 +163,17 @@ describe("headers", () => {
     expect(negotiate("application/vnd.kaeso.kpmr+json; version=3, application/vnd.kaeso.kpmr+json; version=1").ok).toBe(true);
     expect(negotiate("text/html").ok).toBe(false);
     expect(negotiate("application/json; q=0").ok).toBe(false);
+    expect(negotiate('application/vnd.kaeso.kpmr+json; version="1"').ok).toBe(true);
   });
 
   it("chooses an encoding and reads the provider list", () => {
     expect(encodingFor("gzip, br")).toBe("br");
     expect(encodingFor("gzip;q=1, br;q=0")).toBe("gzip");
     expect(encodingFor(undefined)).toBeNull();
-    expect(providerFilter(null)).toBeNull();
-    expect([...(providerFilter("openai, Bad Id ,anthropic") ?? [])]).toEqual(["openai", "anthropic"]);
+    expect(providerFilter(null)).toEqual({ ok: true, ids: null });
+    expect(providerFilter("openai, anthropic")).toEqual({ ok: true, ids: new Set(["openai", "anthropic"]) });
+    expect(providerFilter("")).toMatchObject({ ok: false });
+    expect(providerFilter("Bad Id")).toMatchObject({ ok: false, message: '"Bad Id" is not a provider id.' });
+    expect(providerFilter(Array.from({ length: 65 }, (_, i) => `p${i}`).join(","))).toMatchObject({ ok: false });
   });
 });

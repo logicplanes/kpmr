@@ -124,6 +124,7 @@ sources = [${SOURCE}]
 name = "Example 1"
 modalities = { input = ["text"], output = ["text"] }
 limit = { context = 32000, output = 4000 }
+cost = { input = 0.5, output = 1.5 }
 `,
   },
 ];

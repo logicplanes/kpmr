@@ -34,7 +34,11 @@ export async function startApp({ env, fetch, clock, log }: AppOptions): Promise<
     signingKeyId: config.signingKeyId,
   });
   await service.start();
-  const handler = createHandler(service, { webDir: config.webDir, onError: (error) => log.error("request failed", { error: errorMessage(error) }) });
+  const handler = await createHandler(service, {
+    webDir: config.webDir,
+    origin: config.origin,
+    onError: (error) => log.error("request failed", { error: errorMessage(error) }),
+  });
   const server = createServer((req, res) => void handler(req, res));
   server.keepAliveTimeout = 65_000;
   await new Promise<void>((resolve) => server.listen(config.port, resolve));

@@ -212,6 +212,21 @@ export const de: Messages = {
   "format.field.corrected": "Die Felder, deren Wert wegen KPMR von models.dev abweicht",
 
   "common.modelCount": "{count, plural, one {# Modell} other {# Modelle}}",
+  "seo.overview.title": "KPMR, die Kaeso Provider & Model Registry",
+  "seo.overview.description":
+    "Jeder Anbieter und jedes Modell, das Kaeso kennt: Preise, Grenzen und Fähigkeiten aus models.dev, korrigiert und ergänzt mit einer Quelle für jede Änderung und als signierter Katalog an Kaeso geliefert.",
+  "seo.providers.description": "Jeder Anbieter in KPMR, mit der Zahl seiner Modelle und wie viele davon KPMR korrigiert oder ergänzt.",
+  "seo.provider.description": "{count} Modelle von {provider} in KPMR: Preise, Kontext- und Ausgabegrenzen, Fähigkeiten und jede Korrektur mit ihrer Quelle.",
+  "seo.model.description": "{model} von {provider}: Preise pro Million Tokens, Kontext- und Ausgabegrenzen, Fähigkeiten und was KPMR korrigiert, mit Quellen.",
+  "seo.changes.description":
+    "Jede Änderung im Katalog von KPMR, neueste zuerst: ergänzte oder entfernte Modelle und geänderte Preise, Grenzen und Fähigkeiten, aus models.dev oder der Registry.",
+  "seo.format.description":
+    "Das Katalogformat von KPMR: wie ein Kaeso-Gateway Modelldaten anfragt, welches signierte JSON-Dokument es erhält und wie sich seine Ed25519-Signatur prüfen lässt.",
+  "legal.label": "Rechtliches",
+  "legal.privacy": "Datenschutz",
+  "legal.imprint": "Impressum",
+  "legal.licenses": "Lizenzen",
+  "theme.label": "Erscheinungsbild",
   "common.retry": "Erneut versuchen",
   "common.loading": "Wird geladen",
   "common.failed": "Das konnte nicht geladen werden",

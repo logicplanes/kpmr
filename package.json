@@ -16,7 +16,7 @@
     "node": ">=24.12.0"
   },
   "scripts": {
-    "dev": "KPMR_DATA=.data KPMR_WEB=dist/web PORT=8787 node --watch src/server/main.ts",
+    "dev": "KPMR_DATA=.data KPMR_WEB=dist/web KPMR_PUBLIC_URL=http://localhost:8787 PORT=8787 node --watch src/server/main.ts",
     "dev:web": "vite --config vite.web.config.ts",
     "build": "pnpm registry:check && vite build --config vite.web.config.ts && vite build",
     "start": "node --enable-source-maps dist/server/main.js",

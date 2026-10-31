@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
-import type { Json, JsonObject, Overlay, Rule } from "../registry/schema.ts";
+import { MAX_PRICE, type Json, type JsonObject, type Overlay, type Rule } from "../registry/schema.ts";
 import { FORMAT, type Catalogue, type CatalogueModel, type CatalogueProvider, type Price, type Prices, type Status } from "../shared/catalogue.ts";
 import { decimalText, multiplyDecimal } from "./decimal.ts";
+import { MODELS_DEV_LICENSE } from "./legal/licenses.ts";
 import { equal, isObject, leaves, type Merged, type ModelOrigin } from "./merge.ts";
 
 export const REFRESH_SECONDS = 3600;
@@ -47,8 +48,8 @@ const str = (v: Json | undefined): string | null => (typeof v === "string" && v.
 const bool = (v: Json | undefined): boolean | null => (typeof v === "boolean" ? v : null);
 const int = (v: Json | undefined): number | null => (typeof v === "number" && Number.isInteger(v) && v >= 0 ? v : null);
 const price = (v: Json | undefined): Price => {
-  if (typeof v === "number" && Number.isFinite(v) && v >= 0) return decimalText(v);
-  if (typeof v === "string" && /^\d+(\.\d+)?$/.test(v)) return v;
+  if (typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= MAX_PRICE) return decimalText(v);
+  if (typeof v === "string" && /^\d+(\.\d+)?$/.test(v) && Number(v) <= MAX_PRICE) return v;
   return null;
 };
 const strings = (v: Json | undefined): string[] => (Array.isArray(v) ? v.filter((s): s is string => typeof s === "string") : []);
@@ -81,7 +82,7 @@ export function catalogueModel(id: string, model: JsonObject, origin: ModelOrigi
   const modalities = isObject(model.modalities) ? model.modalities : {};
   const kaeso = isObject(model.kaeso) ? model.kaeso : {};
   const kind = str(model.type) ?? "generation";
-  const reasons = model.reasoning === true;
+  const reasons = model.reasoning === true || ["adaptive_thinking", "thinking_binding", "efforts"].some((k) => kaeso[k] !== undefined);
   return {
     id,
     name: str(model.name),
@@ -140,7 +141,7 @@ export function correctedPaths(original: CatalogueModel, now: CatalogueModel): s
   return [...new Set([...a.keys(), ...b.keys()])].filter((path) => !equal(a.get(path), b.get(path))).sort();
 }
 
-function applyRules(models: JsonObject, rules: Rule[]): void {
+function applyRules(models: JsonObject, rules: Rule[], unsets: Map<string, string[]>): void {
   for (const rule of rules) {
     const [, from] = rule.from.split(".") as [string, string];
     const [, set] = rule.set.split(".") as [string, string];
@@ -148,7 +149,7 @@ function applyRules(models: JsonObject, rules: Rule[]): void {
       if (!isObject(model)) continue;
       const cost = isObject(model.cost) ? model.cost : null;
       const base = cost ? price(cost[from]) : null;
-      if (!cost || base === null || cost[set] !== undefined) continue;
+      if (!cost || base === null || cost[set] !== undefined || unsets.get(id)?.includes(rule.set)) continue;
       models[id] = { ...model, cost: { ...cost, [set]: multiplyDecimal(base, rule.multiply) } };
     }
   }
@@ -163,9 +164,11 @@ export function buildProviders(merged: Merged, overlay: Overlay): Built {
   const providers: Record<string, CatalogueProvider> = {};
   for (const [id, raw] of Object.entries(merged.document)) {
     const models = { ...(isObject(raw.models) ? raw.models : {}) };
+    const unsets = new Map([...(overlay.models.get(id)?.values() ?? [])].map((e) => [e.model, e.unset]));
     applyRules(
       models,
       overlay.rules.filter((r) => r.provider === id),
+      unsets,
     );
     const origins = merged.origins.get(id) ?? new Map<string, ModelOrigin>();
     const upstreamModels = merged.upstream[id]?.models;
@@ -210,7 +213,7 @@ export function catalogue(input: CatalogueInput, only?: ReadonlySet<string>): Ca
     generated_at: input.generatedAt,
     refresh_seconds: REFRESH_SECONDS,
     sources: {
-      models_dev: { url: input.modelsDev.url, fetched_at: input.modelsDev.fetchedAt, sha256: input.modelsDev.sha256 },
+      models_dev: { url: input.modelsDev.url, fetched_at: input.modelsDev.fetchedAt, sha256: input.modelsDev.sha256, license: { ...MODELS_DEV_LICENSE } },
       registry: input.registry,
     },
     provider_ids: input.built.providerIds,

@@ -51,6 +51,15 @@ function action(value: unknown, at: string, problems: string[], allowed: readonl
   return "patch";
 }
 
+function setsPath(fields: Record<string, unknown>, path: string): boolean {
+  let current: unknown = fields;
+  for (const part of path.split(".")) {
+    if (!isObject(current) || !(part in current)) return false;
+    current = current[part];
+  }
+  return true;
+}
+
 function modelEntry(provider: string, model: string, raw: unknown, file: string, today: string, problems: string[]): ModelEntry | null {
   const at = `${file}: models."${model}"`;
   if (!MODEL_ID.test(model)) problems.push(`${at} is not a model id`);
@@ -72,6 +81,8 @@ function modelEntry(provider: string, model: string, raw: unknown, file: string,
   } else if (entry.action === "add") {
     if (entry.unset.length > 0) problems.push(`${at} adds the model, so there is nothing to unset`);
     for (const key of ADDED_MODEL_REQUIRES) if (!(key in fields)) problems.push(`${at} adds the model, so it sets ${key}`);
+  } else if (entry.unset.some((path) => setsPath(entry.fields, path))) {
+    problems.push(`${at} both sets and unsets ${entry.unset.filter((path) => setsPath(entry.fields, path)).join(", ")}`);
   } else if (Object.keys(fields).length === 0 && entry.unset.length === 0) {
     problems.push(`${at} changes nothing: set a field, unset one, or use action = "remove"`);
   }

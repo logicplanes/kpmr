@@ -1,5 +1,5 @@
 import { createHash, generateKeyPairSync } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { readFile, rename } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { brotliCompress, constants, gzip } from "node:zlib";
@@ -28,6 +28,7 @@ const gzipAsync = promisify(gzip);
 const brotliAsync = promisify(brotliCompress);
 
 export const MAX_CHANGES = 2000;
+export const MAX_FILTERED = 12;
 
 export interface Clock {
   now: () => number;
@@ -131,6 +132,7 @@ export class Service {
   private readonly signer: Signer;
   private timer: NodeJS.Timeout | null = null;
   private polling: Promise<void> | null = null;
+  private building: Promise<unknown> = Promise.resolve();
 
   private readonly options: ServiceOptions;
 
@@ -153,7 +155,10 @@ export class Service {
       return JSON.parse(await readFile(this.file(name), "utf8")) as T;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
-      throw new Error(`${this.file(name)} cannot be read: ${errorMessage(error)}`, { cause: error });
+      const aside = `${this.file(name)}.corrupt-${this.options.clock.now()}`;
+      await rename(this.file(name), aside).catch(() => undefined);
+      this.options.log.error("a data file cannot be read; it was moved aside and KPMR starts without it", { file: name, aside, error: errorMessage(error) });
+      return null;
     }
   }
 
@@ -249,8 +254,8 @@ export class Service {
       }
       await writeAtomic(this.file("catalogue.json"), JSON.stringify(full));
       this.previous = full;
-      this.state.published = { hash, generated_at: generatedAt, registry: overlay.revision };
     }
+    this.state.published = { hash, generated_at: generatedAt, registry: overlay.revision };
     await this.saveState();
 
     const body = await bodyOf(full, this.signer, true);
@@ -311,16 +316,30 @@ export class Service {
   catalogueBody(only: ReadonlySet<string> | null): Promise<Body> | null {
     const p = this.publication;
     if (!p) return null;
-    if (!only) return Promise.resolve(p.full);
-    const known = [...only].filter((id) => id in p.built.providers).sort();
+    const known = only ? [...only].filter((id) => id in p.built.providers).sort() : [];
+    if (!only || known.length === p.built.providerIds.length) return Promise.resolve(p.full);
     const key = known.join(",");
-    let body = p.filtered.get(key);
-    if (!body) {
-      if (p.filtered.size >= 32) p.filtered.delete(p.filtered.keys().next().value as string);
-      body = bodyOf(catalogue({ ...this.inputOf(p) }, new Set(known)), this.signer, true);
-      p.filtered.set(key, body);
+    const cached = p.filtered.get(key);
+    if (cached) {
+      p.filtered.delete(key);
+      p.filtered.set(key, cached);
+      return cached;
     }
+    const body: Promise<Body> = this.building
+      .catch(() => undefined)
+      .then(() => bodyOf(catalogue(this.inputOf(p), new Set(known)), this.signer, true))
+      .then((b) => {
+        this.trim(p);
+        return b;
+      });
+    this.building = body;
+    p.filtered.set(key, body);
+    body.catch(() => p.filtered.delete(key));
     return body;
+  }
+
+  private trim(p: Publication): void {
+    while (p.filtered.size > MAX_FILTERED) p.filtered.delete(p.filtered.keys().next().value as string);
   }
 
   private inputOf(p: Publication) {

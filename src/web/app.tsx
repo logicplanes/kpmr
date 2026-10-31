@@ -1,9 +1,12 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { AppFrame, LinkProvider, Sidebar, ThemeProvider, TooltipProvider, Toaster, icons, Select, ThemeSelect } from "@logicplanes/kaeso-ui";
+import { AppFrame, Icon, LinkProvider, Sidebar, ThemeProvider, TooltipProvider, Toaster, icons } from "@logicplanes/kaeso-ui";
 import { setFormatLocale } from "@logicplanes/kaeso-ui/format";
 import { LocaleProvider, loadUiMessages, type UiMessages } from "@logicplanes/kaeso-ui/i18n";
-import { I18nContext, LOCALES, LOCALE_NAMES, translator, useI18n, type Locale } from "./i18n/index.ts";
-import { href, LocationProvider, navigate, RouterLink, useLocation, type Route } from "./router.tsx";
+import { I18nContext, translator, useI18n, type Locale } from "./i18n/index.ts";
+import { SidebarFooter } from "./footer.tsx";
+import { PageBoundary } from "./boundary.tsx";
+import { Failed } from "./page.tsx";
+import { href, LocationProvider, RouterLink, useLocation, type Route } from "./router.tsx";
 import { NotFoundPage } from "./pages/not-found.tsx";
 import { OverviewPage } from "./pages/overview.tsx";
 import { ProviderPage } from "./pages/provider.tsx";
@@ -85,34 +88,28 @@ function Shell() {
                 ))}
               </Sidebar.Group>
               <Sidebar.Group label={t("nav.kaeso")}>
-                <Sidebar.Item icon={icons.home} href="https://kaeso.app">
+                <Sidebar.Item href="https://kaeso.app" trailing={<Icon icon={icons.externalLink} size="xs" />}>
                   kaeso.app
                 </Sidebar.Item>
-                <Sidebar.Item icon={icons.help} href="https://docs.kaeso.app">
+                <Sidebar.Item href="https://docs.kaeso.app" trailing={<Icon icon={icons.externalLink} size="xs" />}>
                   {t("nav.docs")}
+                </Sidebar.Item>
+                <Sidebar.Item href="https://github.com/logicplanes/kpmr" trailing={<Icon icon={icons.externalLink} size="xs" />}>
+                  GitHub
                 </Sidebar.Item>
               </Sidebar.Group>
             </Sidebar.Content>
-            <Sidebar.Footer>
-              <div className="grid grid-cols-2 gap-4">
-                <Select
-                  aria-label={t("nav.language")}
-                  size="sm"
-                  appearance="ghost"
-                  fullWidth
-                  value={locale}
-                  options={LOCALES.map((l) => ({ value: l, label: LOCALE_NAMES[l] }))}
-                  onValueChange={(next: string) => navigate(href(next as Locale, path))}
-                />
-                <ThemeSelect fullWidth />
-              </div>
+            <Sidebar.Footer className="gap-8">
+              <SidebarFooter />
             </Sidebar.Footer>
           </Sidebar>
         }
       >
-        <Suspense fallback={null}>
-          <Page route={route} />
-        </Suspense>
+        <PageBoundary resetKey={path} fallback={<Failed retry={() => window.location.reload()} />}>
+          <Suspense fallback={null}>
+            <Page route={route} />
+          </Suspense>
+        </PageBoundary>
       </AppFrame>
     </Sidebar.Provider>
   );

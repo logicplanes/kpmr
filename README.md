@@ -49,6 +49,7 @@ pnpm dev
 | `KPMR_DATA`             | `/data`                       | The last models.dev copy, the published catalogue, its state and the changes                                                            |
 | `KPMR_POLL`             | `10m`                         | How often models.dev is asked; at least `1m`                                                                                            |
 | `KPMR_MODELS_DEV_URL`   | `https://models.dev/api.json` | Where models.dev is fetched from                                                                                                        |
+| `KPMR_PUBLIC_URL`       | `https://kpmr.kaeso.app`      | The public origin for canonical addresses, the sitemap and social previews                                                              |
 | `KPMR_REVISION`         | `dev`                         | The registry's commit, set by the image build                                                                                           |
 | `KPMR_SIGNING_KEY_FILE` | none                          | The Ed25519 private key (PEM) catalogues are signed with; `KPMR_SIGNING_KEY` holds it inline. Without either, a key is made for the run |
 | `KPMR_SIGNING_KEY_ID`   | `kpmr-2026-10`                | The key's id, sent in `KPMR-Signature` and listed in `/v1/keys.json`                                                                    |

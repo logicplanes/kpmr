@@ -12,7 +12,7 @@ Host: kpmr.kaeso.app
 Accept: ${MEDIA_TYPE}; version=${FORMAT}
 Accept-Encoding: br, gzip
 If-None-Match: "TBZDfwxDDgnfsglvFAGIRhKMmTT"
-User-Agent: kaeso-gateway/0.5.0`;
+User-Agent: kaeso-gateway/0.4.9`;
 
 const RESPONSE = `HTTP/1.1 200 OK
 Content-Type: ${MEDIA_TYPE}; version=${FORMAT}

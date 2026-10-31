@@ -149,3 +149,34 @@ describe("changes", () => {
     expect(diffProviders(after, before, "registry", "t")[1]).toMatchObject({ kind: "added", cause: "registry" });
   });
 });
+
+describe("review fixes", () => {
+  it("normalises float artefacts and keeps tiny and huge prices exact", () => {
+    expect(decimalText(0.04499999999999999)).toBe("0.045");
+    expect(decimalText(0.1 + 0.2)).toBe("0.3");
+    expect(decimalText(1e-13)).toBe("0.0000000000001");
+    expect(decimalText(1e21)).toBe("1000000000000000000000");
+    expect(decimalText(0)).toBe("0");
+    expect(multiplyDecimal("0.04499999999999999", 2)).toBe("0.08999999999999998");
+    expect(multiplyDecimal("1.25", 0.5)).toBe("0.625");
+  });
+
+  it("drops prices above the cap and keeps rules off prices an entry unsets", () => {
+    expect(catalogueModel("m", { cost: { input: 2_000_000, output: "3000001" } }, "upstream").pricing).toMatchObject({ input: null, output: null });
+    const files = REGISTRY.map((f) =>
+      f.path.endsWith("anthropic.toml") ? { ...f, text: f.text.replace('unset = ["cost.output"]', 'unset = ["cost.output", "cost.cache_write_1h"]') } : f,
+    );
+    const o = parseRegistry(files, TODAY, "r");
+    const built = buildProviders(mergeRegistry(structuredClone(UPSTREAM) as Upstream, o), o);
+    expect(built.providers.anthropic?.models["claude-haiku-4-5"]?.pricing.cache_write_1h).toBeNull();
+    expect(built.providers.anthropic?.models["claude-opus-5-5"]?.pricing.cache_write_1h).toBe("8");
+  });
+
+  it("describes reasoning when the registry states reasoning facts for a model models.dev doesn't mark", () => {
+    expect(catalogueModel("m", { reasoning: false, kaeso: { adaptive_thinking: true } }, "upstream").reasoning).toEqual({
+      efforts: null,
+      adaptive_thinking: true,
+      thinking_binding: null,
+    });
+  });
+});

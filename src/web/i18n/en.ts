@@ -210,6 +210,21 @@ export const en = {
   "format.field.corrected": "The fields whose value differs from models.dev because of KPMR",
 
   "common.modelCount": "{count, plural, one {# model} other {# models}}",
+  "seo.overview.title": "KPMR, the Kaeso Provider & Model Registry",
+  "seo.overview.description":
+    "Every provider and model Kaeso knows: prices, limits and capabilities from models.dev, corrected and extended with a source for every change, and served to Kaeso as a signed catalogue.",
+  "seo.providers.description": "Every provider in KPMR, with how many models each has and how many KPMR corrects or adds.",
+  "seo.provider.description": "{count} models from {provider} in KPMR: prices, context and output limits, capabilities, and every correction with its source.",
+  "seo.model.description": "{model} from {provider}: prices per million tokens, context and output limits, capabilities, and what KPMR corrects, with sources.",
+  "seo.changes.description":
+    "Every change in KPMR's catalogue, newest first: models added or removed and changed prices, limits and capabilities, from models.dev or the registry.",
+  "seo.format.description":
+    "The KPMR catalogue format: how a Kaeso gateway asks for model data, the signed JSON document it gets, and how to verify its Ed25519 signature.",
+  "legal.label": "Legal",
+  "legal.privacy": "Privacy",
+  "legal.imprint": "Imprint",
+  "legal.licenses": "Licenses",
+  "theme.label": "Theme",
   "common.retry": "Try again",
   "common.loading": "Loading",
   "common.failed": "This couldn't load",

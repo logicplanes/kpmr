@@ -139,3 +139,26 @@ describe("the service", () => {
     ).toThrow("Ed25519");
   });
 });
+
+describe("the service under strain", () => {
+  it("moves a corrupt data file aside and starts", async () => {
+    const { writeFile, readdir } = await import("node:fs/promises");
+    const first = await makeService();
+    await first.service.poll();
+    await writeFile(join(first.dataDir, "state.json"), '{"version":1,');
+    await writeFile(join(first.dataDir, "changes.json"), "nope");
+    const again = await makeService({ dataDir: first.dataDir });
+    expect((await readdir(first.dataDir)).filter((f) => f.includes(".corrupt-")).length).toBe(2);
+    await again.service.poll();
+    expect(again.service.ready()).toBe(true);
+  });
+
+  it("keeps a bounded number of filtered catalogues and builds one at a time", async () => {
+    const { service } = await makeService();
+    await service.poll();
+    const sets = ["anthropic", "openai", "example", "anthropic,openai", "anthropic,example", "openai,example"].map((s) => new Set(s.split(",")));
+    const bodies = await Promise.all([...sets, ...sets, ...sets].map((s) => service.catalogueBody(s)));
+    expect(bodies.every(Boolean)).toBe(true);
+    expect(await service.catalogueBody(new Set(["anthropic", "openai", "example"]))).toBe(await service.catalogueBody(null));
+  });
+});

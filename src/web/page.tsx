@@ -20,7 +20,7 @@ export function Page({
 }) {
   const { t } = useI18n();
   useEffect(() => {
-    document.title = t("title.page", { page: documentTitle });
+    document.title = documentTitle === t("app.fullName") ? t("seo.overview.title") : t("title.page", { page: documentTitle });
   }, [documentTitle, t]);
   return (
     <>

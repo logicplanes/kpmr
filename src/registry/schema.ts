@@ -158,15 +158,28 @@ export const MODEL_FIELDS: Record<string, Check> = {
   }),
 };
 
+const address: Check = (value, at, problems) => {
+  if (typeof value !== "string" || !/^https:\/\/[^\s/]+\.[^\s]+$/.test(value)) problems.push(`${at} must be an https address, not ${describe(value)}`);
+};
+
 export const PROVIDER_FIELDS: Record<string, Check> = {
   name: text,
   env: listOf(text),
   npm: text,
-  api: text,
-  doc: text,
+  api: address,
+  doc: address,
 };
 
-export const ADDED_MODEL_REQUIRES = ["name", "modalities", "limit"] as const;
+const NESTED: Record<string, readonly string[]> = {
+  modalities: ["input", "output"],
+  limit: ["context", "input", "output"],
+  cost: [...COSTS, "context_over_200k"],
+  provider: ["npm", "api", "shape"],
+  kaeso: ["adaptive_thinking", "thinking_binding", "forced_tool_choice", "efforts", "egress_dialect"],
+  interleaved: ["field"],
+};
+
+export const ADDED_MODEL_REQUIRES = ["name", "modalities", "limit", "cost"] as const;
 export const ADDED_PROVIDER_REQUIRES = ["name"] as const;
 
 const HTTPS = /^https:\/\/[^\s/]+\.[^\s]+$/;
@@ -211,9 +224,14 @@ export function checkUnset(value: unknown, at: string, problems: string[]): stri
   if (!Array.isArray(value) || value.some((p) => typeof p !== "string")) return (void problems.push(`${at}.unset must be a list of field paths`), []);
   const paths = value as string[];
   for (const path of paths) {
-    const [top, ...rest] = path.split(".");
-    if (!top || !MODEL_FIELDS[top] || rest.some((p) => p === "") || rest.length > 2)
-      problems.push(`${at}.unset names ${JSON.stringify(path)}, which is not a field path KPMR knows`);
+    const [top = "", second, third, ...more] = path.split(".");
+    const known =
+      MODEL_FIELDS[top] !== undefined &&
+      more.length === 0 &&
+      (second === undefined || (NESTED[top]?.includes(second) ?? false)) &&
+      (third === undefined || (top === "cost" && second === "context_over_200k" && (COSTS as readonly string[]).includes(third)));
+    if (!known) problems.push(`${at}.unset names ${JSON.stringify(path)}, which is not a field path KPMR knows`);
   }
+  if (new Set(paths).size !== paths.length) problems.push(`${at}.unset lists a path twice`);
   return paths;
 }

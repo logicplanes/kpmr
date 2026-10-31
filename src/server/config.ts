@@ -5,6 +5,7 @@ export interface Config {
   dataDir: string;
   registryDir: string;
   webDir: string;
+  origin: string;
   pollMs: number;
   modelsDevUrl: string;
   revision: string;
@@ -19,6 +20,7 @@ export const DEFAULTS = {
   dataDir: "/data",
   registryDir: ".",
   webDir: "dist/web",
+  origin: "https://kpmr.kaeso.app",
   poll: "10m",
   modelsDevUrl: "https://models.dev/api.json",
   revision: "dev",
@@ -73,6 +75,10 @@ export function readConfig(env: Env): Config {
   if (url.protocol !== "https:" && url.protocol !== "http:")
     throw new ConfigError(`KPMR_MODELS_DEV_URL must be an http or https address, not ${JSON.stringify(modelsDevUrl)}`);
 
+  const origin = (set(env.KPMR_PUBLIC_URL) ?? DEFAULTS.origin).replace(/\/+$/, "");
+  if (!/^https?:\/\/[^\s/]+$/.test(origin))
+    throw new ConfigError(`KPMR_PUBLIC_URL must be an origin such as https://kpmr.kaeso.app, not ${JSON.stringify(origin)}`);
+
   const revision = set(env.KPMR_REVISION) ?? DEFAULTS.revision;
   if (!/^[\w.-]{1,64}$/.test(revision)) throw new ConfigError(`KPMR_REVISION must be a commit or a short name, not ${JSON.stringify(revision)}`);
 
@@ -84,6 +90,7 @@ export function readConfig(env: Env): Config {
     dataDir: set(env.KPMR_DATA) ?? DEFAULTS.dataDir,
     registryDir: set(env.KPMR_REGISTRY) ?? DEFAULTS.registryDir,
     webDir: set(env.KPMR_WEB) ?? DEFAULTS.webDir,
+    origin,
     pollMs,
     modelsDevUrl,
     revision,
