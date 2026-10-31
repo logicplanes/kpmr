@@ -22,7 +22,7 @@ export function LinkCell({ href, label, children }: { href: string; label: strin
       href={href}
       role="listitem"
       aria-label={label}
-      className="group/cell flex min-h-160 min-w-0 flex-col justify-between gap-16 bg-panel p-24 transition-control hover:bg-item-hover focus-ring"
+      className="group/cell flex min-h-240 min-w-0 flex-col gap-16 bg-panel p-24 transition-control hover:bg-item-hover focus-ring md:min-h-320"
     >
       {children}
     </RouterLink>
