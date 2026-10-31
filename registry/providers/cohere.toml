@@ -1,0 +1,20 @@
+[models."command-a-plus-05-2026"]
+note = "Effort `none` or `high` only: `medium` and `low` answer 422. Live check 2026-10-30."
+sources = [
+  { url = "https://docs.cohere.com/docs/compatibility-api", checked = 2026-10-30 },
+]
+kaeso = { efforts = ["none", "high"] }
+
+[models."command-a-reasoning-08-2025"]
+note = "Effort `none` or `high` only: `medium` and `low` answer 422. Live check 2026-10-30."
+sources = [
+  { url = "https://docs.cohere.com/docs/compatibility-api", checked = 2026-10-30 },
+]
+kaeso = { efforts = ["none", "high"] }
+
+[models."north-mini-code-1-0"]
+note = "Effort `none` or `high` only: `medium` and `low` answer 422. Live check 2026-10-30."
+sources = [
+  { url = "https://docs.cohere.com/docs/compatibility-api", checked = 2026-10-30 },
+]
+kaeso = { efforts = ["none", "high"] }

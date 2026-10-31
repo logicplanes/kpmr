@@ -1,0 +1,61 @@
+{
+  "name": "kpmr",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "KPMR, the Kaeso Provider & Model Registry at kpmr.kaeso.app: models.dev, checked, corrected and extended for Kaeso.",
+  "license": "MIT",
+  "author": "Devin Oldenburg",
+  "homepage": "https://kpmr.kaeso.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/logicplanes/kpmr.git"
+  },
+  "packageManager": "pnpm@11.21.0",
+  "engines": {
+    "node": ">=24.12.0"
+  },
+  "scripts": {
+    "dev": "KPMR_DATA=.data KPMR_WEB=dist/web PORT=8787 node --watch src/server/main.ts",
+    "dev:web": "vite --config vite.web.config.ts",
+    "build": "pnpm registry:check && vite build --config vite.web.config.ts && vite build",
+    "start": "node --enable-source-maps dist/server/main.js",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -b",
+    "test": "vitest run --coverage",
+    "registry:check": "node scripts/registry-check.ts",
+    "licenses:check": "node scripts/licenses.ts"
+  },
+  "dependencies": {
+    "@hugeicons/core-free-icons": "4.3.5",
+    "@hugeicons/react": "1.1.10",
+    "@logicplanes/kaeso-tokens": "0.4.8",
+    "@logicplanes/kaeso-ui": "0.4.8",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "smol-toml": "1.9.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@tailwindcss/vite": "4.3.3",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.8",
+    "@types/node": "24.19.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "@vitest/coverage-v8": "5.0.5",
+    "eslint": "10.13.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.13.0",
+    "happy-dom": "21.0.4",
+    "prettier": "3.9.10",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}

@@ -1,0 +1,138 @@
+[models."claude-haiku-4-5"]
+note = "Budget thinking only: the model answers `thinking: {type: adaptive}` with 400. No effort parameter."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = false, efforts = [] }
+
+[models."claude-haiku-4-5-20251001"]
+note = "Budget thinking only: the model answers `thinking: {type: adaptive}` with 400. No effort parameter."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = false, efforts = [] }
+
+[models."claude-sonnet-4-5"]
+note = "Budget thinking only: the model answers `thinking: {type: adaptive}` with 400. No effort parameter."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = false, efforts = [] }
+
+[models."claude-sonnet-4-5-20250929"]
+note = "Budget thinking only: the model answers `thinking: {type: adaptive}` with 400. No effort parameter."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = false, efforts = [] }
+
+[models."claude-opus-4-5"]
+note = "Budget thinking only: the model answers `thinking: {type: adaptive}` with 400. Effort is supported."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = false, efforts = ["low", "medium", "high"] }
+
+[models."claude-opus-4-5-20251101"]
+note = "Budget thinking only: the model answers `thinking: {type: adaptive}` with 400. Effort is supported."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = false, efforts = ["low", "medium", "high"] }
+
+[models."claude-opus-4-6"]
+note = "Adaptive thinking and its effort levels."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = true, efforts = ["low", "medium", "high", "max"] }
+
+[models."claude-sonnet-4-6"]
+note = "Adaptive thinking and its effort levels."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = true, efforts = ["low", "medium", "high", "max"] }
+
+[models."claude-opus-4-7"]
+note = "Adaptive thinking and its effort levels."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = true, efforts = ["low", "medium", "high", "xhigh", "max"] }
+
+[models."claude-opus-4-8"]
+note = "Adaptive thinking and its effort levels."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = true, efforts = ["low", "medium", "high", "xhigh", "max"] }
+
+[models."claude-opus-5"]
+note = "Adaptive thinking and its effort levels."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = true, efforts = ["low", "medium", "high", "xhigh", "max"] }
+
+[models."claude-sonnet-5"]
+note = "Adaptive thinking and its effort levels."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = true, efforts = ["low", "medium", "high", "xhigh", "max"] }
+
+[models."claude-fable-5"]
+note = "Adaptive thinking and its effort levels."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = true, efforts = ["low", "medium", "high", "xhigh", "max"] }
+
+[models."claude-opus-5-5"]
+note = "Adaptive thinking and its effort levels. Thinking is bound to the request: the gateway keeps thinking blocks with the turn they belong to. No forced tool choice: `tool_choice` of type `any` or `tool` returns 400 (token counting included); `auto` works. Live check 2026-10-17."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/about-claude/models/migration-guide", checked = 2026-10-17 },
+]
+kaeso = { adaptive_thinking = true, thinking_binding = true, efforts = ["low", "medium", "high", "xhigh", "max"], forced_tool_choice = false }
+
+[models."claude-sonnet-5-5"]
+note = "Adaptive thinking and its effort levels. Thinking is bound to the request: the gateway keeps thinking blocks with the turn they belong to. No forced tool choice: `tool_choice` of type `any` or `tool` returns 400 (token counting included); `auto` works. Live check 2026-10-17."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/about-claude/models/migration-guide", checked = 2026-10-17 },
+]
+kaeso = { adaptive_thinking = true, thinking_binding = true, efforts = ["low", "medium", "high", "xhigh", "max"], forced_tool_choice = false }
+
+[models."claude-haiku-5-5"]
+note = "Adaptive thinking and its effort levels. Thinking is bound to the request: the gateway keeps thinking blocks with the turn they belong to."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+]
+kaeso = { adaptive_thinking = true, thinking_binding = true, efforts = ["low", "medium", "high", "xhigh", "max"] }
+
+[models."claude-fable-5-1"]
+note = "Adaptive thinking and its effort levels. Thinking is bound to the request: the gateway keeps thinking blocks with the turn they belong to. No forced tool choice: `tool_choice` of type `any` or `tool` returns 400 (token counting included); `auto` works. Live check 2026-10-17."
+sources = [
+  { url = "https://platform.claude.com/docs/en/build-with-claude/thinking", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/build-with-claude/effort", checked = 2026-10-11 },
+  { url = "https://platform.claude.com/docs/en/about-claude/models/migration-guide", checked = 2026-10-17 },
+]
+kaeso = { adaptive_thinking = true, thinking_binding = true, efforts = ["low", "medium", "high", "xhigh", "max"], forced_tool_choice = false }

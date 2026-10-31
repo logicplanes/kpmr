@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+DIR=/opt/logicplanes/kpmr
+STATE=/var/lib/logicplanes/kpmr
+export GIT_SSH_COMMAND="ssh -i $DIR/deploy-key -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15"
+
+head=$(git ls-remote git@github.com:logicplanes/kpmr.git refs/heads/main 2>/dev/null | cut -f1) || true
+[[ -n $head ]] || { echo "kpmr: GitHub unreachable" >&2; exit 0; }
+[[ $head == "$(cat "$STATE/deployed" 2>/dev/null)" ]] && exit 0
+if [[ $head == "$(cat "$STATE/failed" 2>/dev/null)" ]]; then exit 0; fi
+echo "kpmr: new commit ${head:0:12} on main"
+exec "$DIR/bin/kpmr-deploy" "$head"

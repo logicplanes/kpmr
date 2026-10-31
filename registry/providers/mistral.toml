@@ -1,0 +1,6 @@
+[models."mistral-embed"]
+note = "An embedding model: `POST /v1/embeddings` answers with 1024 floats and `GET /v1/models` lists it with `completion_chat: false`. Live check 2026-10-19."
+sources = [
+  { url = "https://docs.mistral.ai/api/", checked = 2026-10-19 },
+]
+kaeso = { egress_dialect = "openai_embeddings" }

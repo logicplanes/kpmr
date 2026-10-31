@@ -1,0 +1,3 @@
+minimumReleaseAgeExclude:
+  - "@logicplanes/kaeso-tokens@0.4.8"
+  - "@logicplanes/kaeso-ui@0.4.8"

@@ -1,0 +1,11 @@
+[Unit]
+Description=Check logicplanes/kpmr for new commits every 2 minutes
+
+[Timer]
+OnBootSec=4min
+OnUnitActiveSec=2min
+RandomizedDelaySec=15s
+AccuracySec=10s
+
+[Install]
+WantedBy=timers.target

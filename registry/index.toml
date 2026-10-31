@@ -1,0 +1,10 @@
+[kaeso]
+providers = ["alibaba", "anthropic", "cohere", "deepseek", "groq", "mistral", "moonshotai", "ollama-cloud", "openai", "openrouter", "togetherai", "vercel", "xai"]
+
+[[rules]]
+provider = "anthropic"
+set = "cost.cache_write_1h"
+from = "cost.input"
+multiply = 2
+note = "A one-hour cache write costs twice the input price; models.dev lists only the five-minute price."
+sources = [{ url = "https://platform.claude.com/docs/en/about-claude/pricing", checked = 2026-10-19 }]

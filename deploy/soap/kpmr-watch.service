@@ -1,0 +1,15 @@
+[Unit]
+Description=Deploy new commits of logicplanes/kpmr to kpmr.kaeso.app
+Documentation=file:/opt/logicplanes/RUNBOOK.md
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/logicplanes/kpmr/bin/kpmr-watch
+TimeoutStartSec=30min
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+SyslogIdentifier=kpmr

@@ -1,0 +1,41 @@
+[models."text-embedding-3-small"]
+note = "An embedding model: only the Embeddings endpoint serves it."
+sources = [
+  { url = "https://developers.openai.com/api/docs/models/text-embedding-3-small", checked = 2026-10-11 },
+]
+kaeso = { egress_dialect = "openai_embeddings" }
+
+[models."text-embedding-3-large"]
+note = "An embedding model: only the Embeddings endpoint serves it."
+sources = [
+  { url = "https://developers.openai.com/api/docs/models/text-embedding-3-large", checked = 2026-10-11 },
+]
+kaeso = { egress_dialect = "openai_embeddings" }
+
+[models."text-embedding-ada-002"]
+note = "An embedding model: only the Embeddings endpoint serves it."
+sources = [
+  { url = "https://developers.openai.com/api/docs/models/text-embedding-ada-002", checked = 2026-10-11 },
+]
+kaeso = { egress_dialect = "openai_embeddings" }
+
+[models."gpt-5.4-mini"]
+note = "Sent through Responses: on Chat Completions the model rejects function tools together with `reasoning_effort`. Live check."
+sources = [
+  { url = "https://developers.openai.com/api/docs/models/gpt-5.4-mini", checked = 2026-10-19 },
+]
+kaeso = { egress_dialect = "openai_responses" }
+
+[models."gpt-6-astra"]
+note = "Sent through Responses: on Chat Completions the model rejects function tools together with `reasoning_effort`. Live check."
+sources = [
+  { url = "https://developers.openai.com/api/docs/models/gpt-6-astra", checked = 2026-10-19 },
+]
+kaeso = { egress_dialect = "openai_responses" }
+
+[models."gpt-5.6-terra"]
+note = "Sent through Responses: on Chat Completions the model rejects function tools together with `reasoning_effort`. Live check."
+sources = [
+  { url = "https://developers.openai.com/api/docs/models/gpt-5.6-terra", checked = 2026-10-19 },
+]
+kaeso = { egress_dialect = "openai_responses" }
