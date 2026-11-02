@@ -1,0 +1,27 @@
+[models."deepseek-flash"]
+note = "A JSON schema answers 400 This response_format type is unavailable now; response_format json_object works. Live check 2026-11-02."
+sources = [
+  { url = "https://api-docs.deepseek.com/guides/json_mode", checked = 2026-11-02 },
+]
+structured_output = false
+
+[models."deepseek-v4-flash"]
+note = "A JSON schema answers 400 This response_format type is unavailable now; response_format json_object works. Live check 2026-11-02."
+sources = [
+  { url = "https://api-docs.deepseek.com/guides/json_mode", checked = 2026-11-02 },
+]
+structured_output = false
+
+[models."deepseek-v4-flash-vision-exp"]
+note = "A JSON schema answers 400 This response_format type is unavailable now; response_format json_object works. Live check 2026-11-02."
+sources = [
+  { url = "https://api-docs.deepseek.com/guides/json_mode", checked = 2026-11-02 },
+]
+structured_output = false
+
+[models."deepseek-v4-pro"]
+note = "A JSON schema answers 400 This response_format type is unavailable now; response_format json_object works. Live check 2026-11-02."
+sources = [
+  { url = "https://api-docs.deepseek.com/guides/json_mode", checked = 2026-11-02 },
+]
+structured_output = false
