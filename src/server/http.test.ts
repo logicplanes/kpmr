@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gunzipSync } from "node:zlib";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createHandler, encodingFor, negotiate, providerFilter } from "./http.ts";
+import { createHandler, encodingFor, jsonBytes, negotiate, providerFilter } from "./http.ts";
 import { makeService } from "./test/helpers.ts";
 import type { Service } from "./service.ts";
 
@@ -147,6 +147,18 @@ describe("the other endpoints", () => {
     expect((await fetch(`${base}/%2e%2e/%2e%2e/etc/passwd`)).status).not.toBe(500);
   });
 
+  it("sends request text back in JSON without HTML characters", async () => {
+    const bad = await fetch(`${base}/v1/catalogue?providers=%3Cscript%3Ealert(1)%26%3C%2Fscript%3E`);
+    expect(bad.status).toBe(400);
+    const raw = await bad.text();
+    expect(raw).not.toMatch(/[<>&]/);
+    expect(raw).toContain("\\u003cscript\\u003e");
+    expect(JSON.parse(raw).error).toBe('"<script>alert(1)&</script>" is not a provider id.');
+    const missing = await (await fetch(`${base}/v1/providers/%3Cimg%3E.json`)).text();
+    expect(missing).not.toMatch(/[<>]/);
+    expect(JSON.parse(missing).error).toBe('KPMR has no provider "<img>".');
+  });
+
   it("answers OPTIONS and refuses other methods", async () => {
     expect((await fetch(`${base}/v1/catalogue`, { method: "OPTIONS" })).status).toBe(204);
     expect((await fetch(`${base}/v1/catalogue`, { method: "POST" })).status).toBe(405);
@@ -164,6 +176,13 @@ describe("headers", () => {
     expect(negotiate("text/html").ok).toBe(false);
     expect(negotiate("application/json; q=0").ok).toBe(false);
     expect(negotiate('application/vnd.kaeso.kpmr+json; version="1"').ok).toBe(true);
+  });
+
+  it("writes JSON that reads back the same", () => {
+    const value = { name: "</script><b>&amp;", n: 1, list: ["<", ">", "&"] };
+    const bytes = jsonBytes(value).toString();
+    expect(bytes).toBe('{"name":"\\u003c/script\\u003e\\u003cb\\u003e\\u0026amp;","n":1,"list":["\\u003c","\\u003e","\\u0026"]}');
+    expect(JSON.parse(bytes)).toEqual(value);
   });
 
   it("chooses an encoding and reads the provider list", () => {
