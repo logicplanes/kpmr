@@ -126,10 +126,10 @@ export function renderHead(html: string, origin: string, resolved: Extract<Resol
       : [`<meta name="robots" content="noindex" />`]),
   ];
   return html
-    .replace(/<html lang="[^"]*"/, `<html lang="${resolved.locale}"`)
-    .replace(/<title>[^<]*<\/title>/, `<title>${escape(head.title)}</title>`)
-    .replace(/<meta\s+name="description"\s+content="[^"]*"\s*\/>/, `<meta name="description" content="${escape(head.description)}" />`)
-    .replace("</head>", `    ${tags.join("\n    ")}\n  </head>`);
+    .replace(/<html lang="[^"]*"/, () => `<html lang="${resolved.locale}"`)
+    .replace(/<title>[^<]*<\/title>/, () => `<title>${escape(head.title)}</title>`)
+    .replace(/<meta\s+name="description"\s+content="[^"]*"\s*\/>/, () => `<meta name="description" content="${escape(head.description)}" />`)
+    .replace("</head>", () => `    ${tags.join("\n    ")}\n  </head>`);
 }
 
 export function sitemap(origin: string, service: Service): string {

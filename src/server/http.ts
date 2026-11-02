@@ -100,10 +100,13 @@ export function encodingFor(header: string | undefined): "br" | "gzip" | null {
   return null;
 }
 
+export const jsonBytes = (value: unknown): Buffer =>
+  Buffer.from(JSON.stringify(value).replace(/</g, "\\u003c").replace(/>/g, "\\u003e").replace(/&/g, "\\u0026"));
+
 const json = (status: number, value: unknown, headers: Record<string, string> = {}): Reply => ({
   status,
   headers: { "content-type": JSON_TYPE, ...API_HEADERS, ...headers },
-  body: Buffer.from(JSON.stringify(value)),
+  body: jsonBytes(value),
 });
 
 const error = (status: number, message: string, headers: Record<string, string> = {}, extra: Record<string, unknown> = {}): Reply =>
@@ -116,7 +119,7 @@ function cached(req: IncomingMessage, type: string, body: Buffer, cacheControl: 
   return { status: 200, headers: { "content-type": type, ...all }, body };
 }
 
-const cachedJson = (req: IncomingMessage, value: unknown) => cached(req, JSON_TYPE, Buffer.from(JSON.stringify(value)), API_CACHE, API_HEADERS);
+const cachedJson = (req: IncomingMessage, value: unknown) => cached(req, JSON_TYPE, jsonBytes(value), API_CACHE, API_HEADERS);
 
 function catalogueReply(req: IncomingMessage, body: Body, revision: string): Reply {
   const encoding = encodingFor(req.headers["accept-encoding"] as string | undefined);
