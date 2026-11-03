@@ -1,5 +1,5 @@
 [kaeso]
-providers = ["alibaba", "anthropic", "cohere", "deepseek", "groq", "mistral", "moonshotai", "ollama-cloud", "openai", "openrouter", "togetherai", "vercel", "xai"]
+providers = ["alibaba", "anthropic", "cerebras", "cohere", "deepseek", "groq", "mistral", "moonshotai", "ollama-cloud", "openai", "openrouter", "togetherai", "vercel", "xai"]
 
 [[rules]]
 provider = "anthropic"

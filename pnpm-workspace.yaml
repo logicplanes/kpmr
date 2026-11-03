@@ -1,5 +1,5 @@
 minimumReleaseAgeExclude:
-  - "@logicplanes/kaeso-tokens@0.4.8"
-  - "@logicplanes/kaeso-ui@0.4.8"
+  - "@logicplanes/kaeso-tokens@0.5.6"
+  - "@logicplanes/kaeso-ui@0.5.6"
 overrides:
   minimatch: 11.0.3

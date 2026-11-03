@@ -18,11 +18,11 @@ importers:
         specifier: 1.1.10
         version: 1.1.10(react@19.3.1)
       '@logicplanes/kaeso-tokens':
-        specifier: 0.4.8
-        version: 0.4.8
+        specifier: 0.5.6
+        version: 0.5.6
       '@logicplanes/kaeso-ui':
-        specifier: 0.4.8
-        version: 0.4.8(@date-fns/tz@1.5.0)(@hugeicons/core-free-icons@4.4.0)(@hugeicons/react@1.1.10(react@19.3.1))(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: 0.5.6
+        version: 0.5.6(@date-fns/tz@1.5.0)(@hugeicons/core-free-icons@4.4.0)(@hugeicons/react@1.1.10(react@19.3.1))(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: 19.3.1
         version: 19.3.1
@@ -317,11 +317,11 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@logicplanes/kaeso-tokens@0.4.8':
-    resolution: {integrity: sha512-zOkcorrkEOHREJai4NTlkev+f223PQk/eIoGjtmwcC81/PEMaoiAteEk/vDSFhHZf1DaTq8VJcTZ0QKDNKmFNw==}
+  '@logicplanes/kaeso-tokens@0.5.6':
+    resolution: {integrity: sha512-oIcuNPvBpTLlepoWyP2BJwz+bFZ9FooKQufmyT/Nw6j4wTJ8eq8/RAJHn3eLLpXia33JJcGUWWFGBrvmiwo6bQ==}
 
-  '@logicplanes/kaeso-ui@0.4.8':
-    resolution: {integrity: sha512-t+3533ttj2dkVRdvvI3ltEhWr94Ac14LvvpDU5uELpnV95rMjN999+mQllhtb3YyUFM/iIsksMP88LgcqWkKpA==}
+  '@logicplanes/kaeso-ui@0.5.6':
+    resolution: {integrity: sha512-A2Ak3F9HNg9q7PvtPO0pThjDL6BR8VbIO2x1bDQ0buSEU/BrxXYt6WmNUncNHy4vd+D2Qz4k8mIG7/m+xFNUUA==}
     peerDependencies:
       '@hugeicons/core-free-icons': ^4.2.0
       '@hugeicons/react': ^1.1.0
@@ -1971,14 +1971,14 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@logicplanes/kaeso-tokens@0.4.8': {}
+  '@logicplanes/kaeso-tokens@0.5.6': {}
 
-  '@logicplanes/kaeso-ui@0.4.8(@date-fns/tz@1.5.0)(@hugeicons/core-free-icons@4.4.0)(@hugeicons/react@1.1.10(react@19.3.1))(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@logicplanes/kaeso-ui@0.5.6(@date-fns/tz@1.5.0)(@hugeicons/core-free-icons@4.4.0)(@hugeicons/react@1.1.10(react@19.3.1))(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@base-ui/react': 1.9.0(@date-fns/tz@1.5.0)(@types/react@19.3.0)(date-fns@4.4.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@hugeicons/core-free-icons': 4.4.0
       '@hugeicons/react': 1.1.10(react@19.3.1)
-      '@logicplanes/kaeso-tokens': 0.4.8
+      '@logicplanes/kaeso-tokens': 0.5.6
       '@tanstack/react-table': 8.21.3(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@tanstack/react-virtual': 3.14.22(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       clsx: 2.1.1
