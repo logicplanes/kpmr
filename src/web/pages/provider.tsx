@@ -25,7 +25,7 @@ import { href, modelPath, navigate } from "../router.tsx";
 
 const hostOf = (url: string) => {
   try {
-    return new URL(url).host;
+    return new URL(url).host.replace(/^www\./, "");
   } catch {
     return url;
   }
@@ -152,7 +152,7 @@ function Provider({ view }: { view: ProviderView }) {
             {t("provider.docs")}
           </Text>
           {p.docs_url ? (
-            <Link href={p.docs_url} external>
+            <Link href={p.docs_url} external className="max-w-full self-start wrap-anywhere">
               {hostOf(p.docs_url)}
             </Link>
           ) : (
